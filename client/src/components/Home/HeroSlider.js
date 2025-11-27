@@ -12,7 +12,7 @@ const HeroSlider = () => {
       subtitle: "Discover the latest tech innovations",
       description:
         "Up to 50% off on premium headphones, smartwatches, and more",
-      image: "./electronics.jpg",
+      image: "./Electronics.jpg",
       cta: "Shop Electronics",
       url: "/products?category=Electronics",
     },
@@ -21,7 +21,7 @@ const HeroSlider = () => {
       title: "Fashion Forward",
       subtitle: "Style meets comfort",
       description: "New arrivals in designer clothing and accessories",
-      image: "./fashion.jpg",
+      image: "./fashions.jpg",
       cta: "Explore Fashion",
       url: "/products?category=Fashion",
     },
@@ -30,16 +30,61 @@ const HeroSlider = () => {
       title: "Home & Garden",
       subtitle: "Transform your space",
       description: "Beautiful furniture and decor for every home",
-      image: "./furniture.jpg",
+      image: "./home.jpg",
       cta: "Shop Home",
       url: `/products?category=Home & Garden`,
+    },
+    {
+      id: 4,
+      title: "Sports & Fitness",
+      subtitle: "Gear up for every workout",
+      description: "Performance apparel, smart trackers, and gym essentials",
+      image: "./sports.jpg",
+      cta: "Shop Sports",
+      url: "/products?category=Sports",
+    },
+    {
+      id: 5,
+      title: "Book Haven",
+      subtitle: "Stories for every shelf",
+      description: "Bestsellers, classics, and inspiring non-fiction picks",
+      image: "./book.jpg",
+      cta: "Browse Books",
+      url: "/products?category=Books",
+    },
+    {
+      id: 6,
+      title: "Beauty & Glow",
+      subtitle: "Self-care starts here",
+      description: "Skincare, makeup, and grooming sets curated for you",
+      image: "./beauty.jpg",
+      cta: "Shop Beauty",
+      url: "/products?category=Beauty",
+    },
+    {
+      id: 7,
+      title: "Auto Essentials",
+      subtitle: "Drive with confidence",
+      description: "Detailing kits, smart accessories, and travel gear",
+      image: "./automotive.jpg",
+      cta: "Shop Automotive",
+      url: "/products?category=Automotive",
+    },
+    {
+      id: 8,
+      title: "Kids & Baby",
+      subtitle: "Joyful finds for little ones",
+      description: "Toys, apparel, and nursery must-haves parents love",
+      image: "./kids.jpg",
+      cta: "Shop Kids",
+      url: "/products?category=Kids & Baby",
     },
   ];
 
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % slides.length);
-    }, 8000);
+    }, 1900);
     return () => clearInterval(timer);
   }, []);
 
