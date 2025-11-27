@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {removeFromCart, updateCartQuantity} from "../../store/slices/cartSlice";
 import {toggleCart, toggleSidebar} from "../../store/slices/popupSlice";
+import { formatCurrency } from "../../lib/currency";
 const CartSidebar = () => {
   const dispatch = useDispatch();
   const { isCartOpen } = useSelector((state) => state.popup);
@@ -75,7 +76,7 @@ if (!isCartOpen) return null;
                         <h3 className="font-semibold text-foreground truncate">
                           {item.product.name}
                         </h3>
-                        <p className="text-primary font-semibold">${item.product.price}</p>
+                        <p className="text-primary font-semibold">{formatCurrency(item.product.price)}</p>
 
                         {/* Quantity Controls */}
                         <div className="flex items-center space-x-2 mt-2">
@@ -126,7 +127,7 @@ if (!isCartOpen) return null;
               <div className="flex justify-between items-center mb-4">
                 <span className="text-lg font-semibold">Total:</span>
                 <span className="text-xl font-bold text-primary">
-                  ${total.toFixed(2)}
+                  {formatCurrency(total)}
                 </span>
               </div>
               <Link
