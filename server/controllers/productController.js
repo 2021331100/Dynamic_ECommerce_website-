@@ -42,7 +42,7 @@ if (req.files && (req.files.images || req.files.image)) {
     [
       name,
       description,
-      price / 120,
+      price,
       category,
       stock,
       JSON.stringify(uploadedImages),
@@ -198,7 +198,7 @@ export const updateProduct = catchAsyncErrors(async (req, res, next) => {
   }
   const result = await database.query(
     `UPDATE products SET name = $1, description = $2, price = $3, category = $4, stock = $5 WHERE id = $6 RETURNING *`,
-    [name, description, price / 120, category, stock, productId]
+    [name, description, price, category, stock, productId]
   );
   res.status(200).json({
     success: true,
@@ -505,17 +505,18 @@ export const fetchAIFilteredProducts = catchAsyncErrors(
     }
 
     // STEP 2: AI FILTERING
-    const { success, products } = await getAIRecommendation(
-      req,
-      res,
-      userPrompt,
-      filteredProducts
-    );
+    const {
+      success,
+      products: aiProducts,
+      message: aiMessage,
+    } = await getAIRecommendation(userPrompt, filteredProducts);
 
     res.status(200).json({
-      success: success,
-      message: "AI filtered products.",
-      products,
+      success: true,
+      message: success
+        ? "AI filtered products."
+        : aiMessage || "Showing filtered products without AI.",
+      products: aiProducts,
     });
   }
 );
