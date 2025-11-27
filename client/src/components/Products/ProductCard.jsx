@@ -3,6 +3,7 @@ import { Star, ShoppingCart } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { addToCart } from "../../store/slices/cartSlice";
+import { formatCurrency } from "../../lib/currency";
 const ProductCard = ({ product }) => {
     const dispatch = useDispatch();
     const handleAddToCart = (product, e) => {
@@ -61,7 +62,7 @@ const ProductCard = ({ product }) => {
             {/*Product Price*/}
                 <div className="flex items-center space-x-2">
                 <span className="text-xl font-bold text-primary">
-                  ${product.price}
+                  {formatCurrency(product.price)}
                 </span>
               </div>
 
