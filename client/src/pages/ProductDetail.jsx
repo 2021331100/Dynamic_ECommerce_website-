@@ -72,9 +72,49 @@ const ProductDetail = () => {
       </div>
     );
   }
+  return (<>
+    <div className="min-h-screen pt-20">
+      <div className="container mx-auto py-4 px-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-16">
+          <div>
+            <div className="glass-card p-4 mb-4">
+            {product.images ? (
+              <img
+                src={product.images[selectedImage]?.url}
+                alt={product.name}
+                className="w-full h-96 object-contain rounded-lg"
+              />
+            ) : (
+              <div className="glass-card min-h-[418px] p-4 mb-4 animate-pulse"/>
+            )}
+            </div>
+            <div className="flex space-x-2">
+            {product.images && product?.images.map((image, index) => {
+                return (
+                  <button
+                    key={index}
+                    onClick={() => setSelectedImage(index)}
+                    className={`w-20 h-20 rounded-lg overflow-hidden border-2 transition-all ${
+                      selectedImage === index
+                        ? "border-primary"
+                        : "border-transparent"
+                    }`}
+                  >
+                    <img
+                      src={image?.url}
+                      alt={`${product.title} ${index + 1}`}
+                      className="w-full h-full object-contain"
+                    />
+                  </button>
+                );
+              })}
+          </div>
+          </div>
+
+          
 
 
-  
+  </>);
 };
 
 export default ProductDetail;
