@@ -50,6 +50,7 @@ const ProductDetail = () => {
   useEffect(() => {
     dispatch(fetchProductDetails(id));
   }, [dispatch, id]);
+
   if (!product) {
     return (
       <div className="min-h-screen pt-20 flex items-center justify-center">
@@ -72,6 +73,7 @@ const ProductDetail = () => {
       </div>
     );
   }
+
   return (<>
     <div className="min-h-screen pt-20">
       <div className="container mx-auto py-4 px-8">
@@ -231,8 +233,52 @@ const ProductDetail = () => {
 
 
             </div>
-          </div>     
+          </div>
+    
+        </div>
+        <div className="glass-panel">
+            <div className="flex border-b border-[hsla(var(--glass-border))]">
+              {["description", "reviews"].map((tab) => {
+                return (
+                  <button
+                    key={tab}
+                    onClick={() => setActiveTab(tab)}
+                    className={`px-4 py-4 font-medium capitalize transition-all ${
+                      activeTab === tab
+                        ? "text-primary border-b-2 border-primary"
+                        : "text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    {tab}
+                  </button>
+                );
+              })}
+            </div>
 
+            <div className="p-6">
+              {activeTab === "description" && (
+                <div>
+                  <h3 className="text-xl font-semibold text-foreground mb-4">
+                    Product Description
+                  </h3>
+                  <p className="text-muted-foreground leading-relaxed">
+                    {product.description}
+                  </p>
+                </div>
+              )}
+              {activeTab==="reviews"&&(
+                  <>
+                    <ReviewsContainer
+                      product={product}
+                      productReviews={productReviews}
+                    />
+                  </>
+                )
+              }
+            </div>
+          </div>
+      </div>
+    </div>
 
   </>);
 };
