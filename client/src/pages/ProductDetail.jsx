@@ -50,7 +50,28 @@ const ProductDetail = () => {
   useEffect(() => {
     dispatch(fetchProductDetails(id));
   }, [dispatch, id]);
+  if (!product) {
+    return (
+      <div className="min-h-screen pt-20 flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-foreground mb-4">
+            Product Not Found
+          </h1>
+          <p className="text-muted-foreground">
+            The product you're looking for does not exist.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <Loader className="size-10 animate-spin" />
+      </div>
+    );
+  }
 
 
   
