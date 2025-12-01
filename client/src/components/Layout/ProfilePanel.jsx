@@ -22,6 +22,31 @@ const ProfilePanel = () => {
       setEmail(authUser.email || "");
     }
   }, [authUser]);
+    const[showPassword,setShowPassword]=useState("");
+  const[currentPassword,setCurrentPassword]=useState("");
+  const[newPassword,setNewPassword]=useState("");
+  const[confirmNewPassword,setConfirmNewPassword]=useState("");
+  
+  const handleLogout= ()=>{
+    dispatch(logout());
+  };
+
+  const handleUpdateProfile = () => {
+  const formData = new FormData();
+  formData.append("name", name);
+  formData.append("email", email);
+  if (avatar) formData.append("avatar", avatar);
+  dispatch(updateProfile(formData));
+  };
+
+  const handleUpdatePassword = () => {
+    const formData = new FormData();
+    formData.append("currentPassword", currentPassword);
+    formData.append("newPassword", newPassword);
+    formData.append("confirmNewPassword", confirmNewPassword);
+    dispatch(updatePassword(formData));
+  };
+  if(!isAuthPopupOpen || !authUser) return null;
   
   
 };
