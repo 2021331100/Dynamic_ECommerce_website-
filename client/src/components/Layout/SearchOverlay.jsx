@@ -31,6 +31,13 @@ const SearchOverlay = () => {
               <h2 className="text-xl font-semibold text-primary">
                 Search Products
               </h2>
+              <button
+                onClick={() => dispatch(toggleSearchBar())}
+                className="p-2 rounded-lg glass-card hover:glow-on-hover animate-smooth"
+              >
+                <X className="w-5 h-5 text-primary" />
+              </button>
+            </div>
 
   </>
   );
