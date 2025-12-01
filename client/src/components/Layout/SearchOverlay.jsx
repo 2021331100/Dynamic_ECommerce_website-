@@ -38,7 +38,14 @@ const SearchOverlay = () => {
                 <X className="w-5 h-5 text-primary" />
               </button>
             </div>
-
+              <div className="relative">
+              {/* SEARCH ICON BUTTON */}
+              <button
+                onClick={handleSearch}
+                className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground"
+              >
+                <Search className="w-5 h-5 text-primary" />
+              </button>
   </>
   );
 };
