@@ -29,7 +29,17 @@ const Sidebar = () => {
 
   const { isSidebarOpen } = useSelector(state => state.popup);
   if (!isSidebarOpen) return null;
-  
+
+  return(<>
+    {/* OVERLAY */}
+    <div
+      className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40"
+      onClick={() => dispatch(toggleSidebar())}
+    />
+
+
+  </>
+  );
 };
 
 export default Sidebar;
