@@ -9,6 +9,7 @@ import { useState, useEffect } from "react";
 import { fetchAllProducts } from "../store/slices/productSlice";
 import { toggleAIModal } from "../store/slices/popupSlice";
 import { formatCurrency } from "../lib/currency";
+
 const Products = () => {
   const {products,totalProducts}=useSelector((state)=>state.product);
   const useQuery =()=>{
@@ -52,7 +53,7 @@ const Products = () => {
   ]);
   const ITEMS_PER_PAGE = 12;
   const totalPages = Math.ceil(totalProducts / ITEMS_PER_PAGE);
-return (<>
+  return (<>
     <div className="min-h-screen mx-auto pt-20">
     <div className="container mx-auto px-4">
       <div className="flex flex-col lg:flex-row gap-8">
@@ -122,6 +123,7 @@ return (<>
                   );
                 })}
               </div>
+              
             </div>
             {/* AVAILABILITY */}
             <div className="mb-6">
@@ -183,6 +185,9 @@ return (<>
                 })}
               </div>
             </div>
+
+          </div>
+        </div>
         {/* MAIN CONTENT */}
         <div className="flex-1">
           {/* SEARCH BAR */}
@@ -242,10 +247,12 @@ return (<>
             </div>
           )}
         </div>
-
-
+      </div>
+    </div>
+  {/*AISearhcModal */}
+  <AISearchModal /> 
+  </div>
   </>);
-  
 };
 
 export default Products;
