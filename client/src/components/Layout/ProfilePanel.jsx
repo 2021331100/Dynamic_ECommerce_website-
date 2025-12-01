@@ -16,6 +16,12 @@ const ProfilePanel = () => {
   const [name, setName] = useState(authUser?.name || "");
   const [email, setEmail] = useState(authUser?.email || "");
   const [avatar, setAvatar] = useState(null);
+  useEffect(() => {
+    if (authUser) {
+      setName(authUser.name || "");
+      setEmail(authUser.email || "");
+    }
+  }, [authUser]);
   
   
 };
