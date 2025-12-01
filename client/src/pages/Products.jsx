@@ -52,7 +52,51 @@ const Products = () => {
   ]);
   const ITEMS_PER_PAGE = 12;
   const totalPages = Math.ceil(totalProducts / ITEMS_PER_PAGE);
+return (<>
+    <div className="min-h-screen mx-auto pt-20">
+    <div className="container mx-auto px-4">
+      <div className="flex flex-col lg:flex-row gap-8">
+        {/* MOBILE FILTER TOGGLE */}
+        <button
+          onClick={() => setIsMobileFilterOpen(!isMobileFilterOpen)}
+          className="lg:hidden mb-4 p-3 glass-card hover:glow-on-hover animate-smooth flex items-center space-x-2"
+        >
+          <Filter className="w-5 h-5" />
+          <span>Filters</span>
+        </button>
 
+        {/* SIDEBAR FILTERS */}
+        <div
+          className={`lg:block ${isMobileFilterOpen ? "block" : "hidden"
+            }w-full lg:w-80 space-y-6`}
+        >
+          <div className="glass-panel">
+            <h2 className="text-xl font-semibold text-foreground mb-6">Filters</h2>
+            {/* PRICE RANGE */}
+            <div className="mb-6">
+              <h3 className="text-lg font-medium text-foreground mb-3">
+                Price Range
+              </h3>
+              <div className="space-y-2">
+                <input
+                  type="range"
+                  min="0"
+                  max="1000000"
+                  value={priceRange[1]}
+                  onChange={(e) =>
+                    setPriceRange([priceRange[0], parseInt(e.target.value)])
+                  }
+                  className="w-full"
+                />
+                <div className="flex justify-between text-sm text-muted-foreground">
+                  <span>{formatCurrency(priceRange[0])}</span>
+                  <span>{formatCurrency(priceRange[1])}</span>
+                </div>
+              </div>
+            </div>
+
+
+  </>);
   
 };
 
