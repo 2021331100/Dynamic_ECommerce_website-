@@ -41,8 +41,40 @@ const Stats = () => {
       setRevenueChange(revenueChangeText);
     }
   }, [yesterdayRevenue]);
-
-  
+  return (
+    <>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {stats.map((stat, index) => {
+          return (
+            <div
+              key={index}
+              className={`bg-white p-4 rounded-xl shadow-md ${
+                index !== 0 && "flex gap-2 flex-col"
+              }`}
+            >
+              <div className="text-sm text-gray-500">{stat.title}</div>
+              <div
+                className={`text-xl font-semibold ${
+                  index !== 0 && "text-[30px] overflow-y-hidden"
+                }`}
+              >
+                {stat.value}
+              </div>
+              {stat.change && (
+                <div
+                  className={`text-sm ${stat.change.startsWith(
+                    "+" ? "text-green-500" : "text-red-500"
+                  )}`}
+                >
+                  {stat.change} than last period
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </>
+  );
 };
 
 export default Stats;
