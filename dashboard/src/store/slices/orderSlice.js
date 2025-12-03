@@ -16,3 +16,19 @@ export const fetchAllOrders = createAsyncThunk(
     }
   }
 );
+export const updateOrderStatus = createAsyncThunk(
+  "orders/updateStatus",
+  async ({ orderId, status }, thunkAPI) => {
+    try {
+      const { data } = await axiosInstance.put(
+        `/order/admin/update/${orderId}`,
+        { status }
+      );
+      toast.success(data.message || "Order status updated successfully.");
+      return data.updatedOrder;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(
+        error.response?.data?.message || "Failed to update order status."
+      );
+    }
+  }
