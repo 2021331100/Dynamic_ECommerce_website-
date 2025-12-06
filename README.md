@@ -48,3 +48,49 @@ DB_PORT=5432
 DB_USER=postgres
 DB_PASSWORD=your_db_password
 DB_NAME=mern_ecommerce_store
+
+# Stripe
+STRIPE_SECRET_KEY=sk_live_or_test
+STRIPE_WEBHOOK_SECRET=whsec_xxx
+STRIPE_FRONTEND_KEY=pk_live_or_test
+
+# Currency conversion (if catalog prices are BDT)
+BDT_TO_USD=0.0091
+
+# Email (SMTP)
+SMTP_SERVICE=gmail
+SMTP_MAIL=you@example.com
+SMTP_PASSWORD=app_password
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=465
+
+# Cloudinary
+CLOUDINARY_CLIENT_NAME=xxxx
+CLOUDINARY_CLIENT_API=xxxx
+CLOUDINARY_CLIENT_SECRET=xxxx
+```
+
+Client and dashboard `.env` (Vite style):
+```
+VITE_API_URL=http://localhost:4000/api/v1
+VITE_STRIPE_PUBLISHABLE_KEY=pk_live_or_test
+```
+
+## Install & Run (dev)
+### Server (Express + Postgres)
+```
+cd server
+npm install
+npm run dev
+```
+- Runs on `PORT` (default 4000).
+- `createTables()` seeds schema on start.
+- Stripe webhook: `/api/v1/payment/webhook` (raw body enabled in `app.js`).
+
+### Client (storefront)
+```
+cd client
+npm install
+npm run dev
+```
+Visit `http://localhost:5173`.
