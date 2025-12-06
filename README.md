@@ -94,3 +94,57 @@ npm install
 npm run dev
 ```
 Visit `http://localhost:5173`.
+
+### Dashboard (admin)
+```
+cd dashboard
+npm install
+npm run dev
+```
+Visit `http://localhost:5174`.
+
+## Build
+- Client: `cd client && npm run build` → `dist/`
+- Dashboard: `cd dashboard && npm run build`
+- Server: `npm start` (no bundling; ensure env vars set)
+
+## Key Features
+- Products: list, view, filter (category, price range, rating, availability), AI search, pagination (12/page)
+- Cart/Orders: place orders, shipping info capture, tax/shipping calculation
+- Payments: Stripe PaymentIntent, webhook updates order/payment status, stock decrement on success
+- Media: Cloudinary upload support
+- Auth: JWT-based auth with cookies
+- Admin: product CRUD, order view, dashboard charts (sales, low stock), modals for create/update/view
+
+## API Surface (high level)
+- Auth: `/api/v1/auth` (login/register/profile etc.)
+- Products: `/api/v1/product` (list with filters: category, price `min-max`, search, ratings, availability, page)
+- Orders: `/api/v1/order` (place order, my orders, webhook updates)
+- Admin: `/api/v1/admin` (product and order management)
+- Payments: `/api/v1/payment/webhook` (Stripe webhook; uses `stripe-signature` header)
+
+## Payments (Stripe)
+- Amount is sent in the configured currency inside `generatePaymentIntent`.
+- If catalog prices are BDT, convert before calling Stripe (e.g., `amountInUsdCents = totalPrice * BDT_TO_USD * 100`, `currency: "usd"`).
+- Set webhook endpoint in Stripe Dashboard to `<your-api-host>/api/v1/payment/webhook` using `STRIPE_WEBHOOK_SECRET`.
+
+## Database Notes
+- `price` is `DECIMAL(10,2)` (max ≈ 9,999,999.99).
+- Tables auto-create on server start. For manual changes, run SQL via psql/pgAdmin.
+- Stock is decremented after successful payment webhook.
+
+## Deployment Notes
+- Storefront & dashboard: deploy to Vercel/Netlify; set `VITE_API_URL` to your backend URL and `VITE_STRIPE_PUBLISHABLE_KEY`.
+- Backend: use a long-running Node host (Render/Railway/Fly/AWS). If moving to Vercel serverless, remove `app.listen` and export the Express handler; adjust routes under `/api`.
+- Set env vars in your hosting provider; never commit `.env`.
+
+## Security & Secrets
+- `.env` files are gitignored. Keep secrets out of commits.
+- Rotate Stripe, Cloudinary, SMTP, JWT secrets if exposed.
+- Use strong JWT secret and unique SMTP app password.
+
+## Troubleshooting
+- Price overflow: ensure DB column is `DECIMAL(10,2)` and run `ALTER TABLE products ALTER COLUMN price TYPE DECIMAL(10,2);` in DB.
+- Stripe high-amount failures: convert BDT totals to the Stripe currency before creating PaymentIntent.
+- CORS: confirm `FRONTEND_URL` and `DASHBOARD_URL` match the running origins; both are allowed in `app.js`.
+- Webhook 400: ensure raw body is preserved and `STRIPE_WEBHOOK_SECRET` matches; check the `stripe-signature` header.
