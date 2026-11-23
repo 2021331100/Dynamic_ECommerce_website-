@@ -22,9 +22,6 @@ app.use((req, res, next) => {
   if (origin && !allowedOrigins.includes(origin)) {
     return res.status(403).json({ success: false, message: "Origin is not allowed." });
   }
-  if (["POST", "PUT", "PATCH", "DELETE"].includes(req.method) && origin && !allowedOrigins.includes(origin)) {
-    return res.status(403).json({ success: false, message: "Request origin is not allowed." });
-  }
   res.setHeader("X-Content-Type-Options", "nosniff");
   res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
   res.setHeader("X-Frame-Options", "DENY");
@@ -35,10 +32,9 @@ app.use((req, res, next) => {
   next();
 });
 
-const allowedOrigins = [
-  process.env.FRONTEND_URL,
-  process.env.DASHBOARD_URL,
-].filter(Boolean);
+const allowedOrigins = [process.env.FRONTEND_URL, process.env.DASHBOARD_URL]
+  .filter(Boolean)
+  .map((value) => new URL(value).origin);
 
 app.use(cors({
   origin(origin, callback) {
