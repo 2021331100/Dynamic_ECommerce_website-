@@ -2,7 +2,7 @@ import dotenv from "dotenv";
 
 dotenv.config({ path: process.env.ENV_FILE || "./config/config.env" });
 
-const required = ["JWT_SECRET_KEY", "STRIPE_SECRET_KEY", "CLOUDINARY_CLIENT_NAME", "CLOUDINARY_CLIENT_API", "CLOUDINARY_CLIENT_SECRET"];
+const required = ["JWT_SECRET_KEY", "STRIPE_SECRET_KEY", "STRIPE_WEBHOOK_SECRET", "CLOUDINARY_CLIENT_NAME", "CLOUDINARY_CLIENT_API", "CLOUDINARY_CLIENT_SECRET"];
 const databaseRequired = process.env.DATABASE_URL ? [] : ["DB_USER", "DB_NAME", "DB_PASSWORD"];
 const missing = [...required, ...databaseRequired].filter((key) => !process.env[key]);
 if (missing.length) {
