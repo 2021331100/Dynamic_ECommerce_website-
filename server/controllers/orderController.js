@@ -259,8 +259,9 @@ GROUP BY o.id, s.id
 
 export const updateOrderStatus = catchAsyncErrors(async (req, res, next) => {
   const { status } = req.body;
-  if (!status) {
-    return next(new ErrorHandler("Provide a valid status for order.", 400));
+  const allowedStatuses = ["Processing", "Shipped", "Delivered", "Cancelled"];
+  if (!allowedStatuses.includes(status)) {
+    return next(new ErrorHandler("Provide a valid order status.", 400));
   }
   const { orderId } = req.params;
   const results = await database.query(
