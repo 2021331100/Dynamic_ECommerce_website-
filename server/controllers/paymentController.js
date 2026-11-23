@@ -85,7 +85,10 @@ export const paymentWebhook = async (req, res) => {
         if (stockUnavailable) {
           // Payment was captured but stock is no longer available. Refund rather than
           // confirming an order that cannot be fulfilled.
-          await stripe.refunds.create({ payment_intent: intent.id });
+          await stripe.refunds.create(
+            { payment_intent: intent.id },
+            { idempotencyKey: `stock-refund-${intent.id}` }
+          );
           await client.query(
             "UPDATE payments SET payment_status = 'Failed' WHERE payment_intent_id = $1 AND payment_status = 'Pending'",
             [intent.id]
