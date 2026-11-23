@@ -23,7 +23,7 @@ Full-stack commerce app with: customer storefront (Vite/React/Tailwind), admin d
 - `.gitignore` — ignores envs, uploads, build artifacts
 
 ## Prerequisites
-- Node.js 18+
+- Node.js 20+
 - PostgreSQL 14+ (tested with 18)
 - Stripe account + API keys
 - Cloudinary account (cloud name, key, secret)
@@ -125,6 +125,7 @@ Visit `http://localhost:5174`.
 - Payments: `/api/v1/payment/webhook` (Stripe webhook; uses `stripe-signature` header)
 
 ## Payments (Stripe)
+- Amounts are converted using `STRIPE_AMOUNT_MULTIPLIER` and sent in `STRIPE_CURRENCY`. Keep the multiplier at `1` when catalog prices already use the Stripe currency. If the catalog uses BDT and Stripe charges USD, set a current BDT-to-USD multiplier and make the displayed checkout total clear.
 - Amount is sent in the configured currency inside `generatePaymentIntent`.
 - If catalog prices are BDT, convert before calling Stripe (e.g., `amountInUsdCents = totalPrice * BDT_TO_USD * 100`, `currency: "usd"`).
 - Configure the Stripe webhook endpoint `<your-api-host>/api/v1/payment/webhook` with the `STRIPE_WEBHOOK_SECRET` signing secret. Subscribe to `payment_intent.succeeded`, `payment_intent.payment_failed`, and `payment_intent.canceled`. Test duplicate delivery, failed payments, and the out-of-stock refund path in Stripe test mode before enabling live payments.
