@@ -38,7 +38,7 @@ export const paymentWebhook = async (req, res) => {
         }
 
         const { order_id: orderId, payment_status: paymentStatus } = paymentResult.rows[0];
-        if (paymentStatus === "Paid") {
+        if (paymentStatus !== "Pending") {
           await client.query("COMMIT");
           return res.status(200).json({ received: true, duplicate: true });
         }
