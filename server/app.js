@@ -11,6 +11,11 @@ import { errorMiddleware } from "./middlewares/errorMiddleware.js";
 
 const app = express();
 
+const allowedOrigins = [process.env.FRONTEND_URL, process.env.DASHBOARD_URL]
+  .filter(Boolean)
+  .map((value) => new URL(value).origin);
+
+
 app.disable("x-powered-by");
 if (process.env.NODE_ENV === "production") {
   app.set("trust proxy", 1);
@@ -31,10 +36,6 @@ app.use((req, res, next) => {
   }
   next();
 });
-
-const allowedOrigins = [process.env.FRONTEND_URL, process.env.DASHBOARD_URL]
-  .filter(Boolean)
-  .map((value) => new URL(value).origin);
 
 app.use(cors({
   origin(origin, callback) {
