@@ -51,6 +51,8 @@ DB_NAME=mern_ecommerce_store
 # Stripe
 STRIPE_SECRET_KEY=sk_live_or_test
 STRIPE_WEBHOOK_SECRET=whsec_xxx
+STRIPE_CURRENCY=usd
+STRIPE_AMOUNT_MULTIPLIER=1
 STRIPE_FRONTEND_KEY=pk_live_or_test
 
 # Currency conversion (if catalog prices are BDT)
@@ -110,7 +112,7 @@ Visit `http://localhost:5174`.
 ## Key Features
 - Products: list, view, filter (category, price range, rating, availability), AI search, pagination (12/page)
 - Cart/Orders: place orders, shipping info capture, tax/shipping calculation
-- Payments: Stripe PaymentIntent creation is wired. **A verified Stripe webhook and stock reservation/fulfilment flow are still required before live payments.**
+- Payments: Stripe PaymentIntent creation and signed webhook reconciliation; stock is checked/decremented on successful payment, and an out-of-stock payment is refunded.
 - Media: Cloudinary upload support
 - Auth: JWT-based auth with cookies
 - Admin: product CRUD, order view, dashboard charts (sales, low stock), modals for create/update/view
@@ -125,12 +127,12 @@ Visit `http://localhost:5174`.
 ## Payments (Stripe)
 - Amount is sent in the configured currency inside `generatePaymentIntent`.
 - If catalog prices are BDT, convert before calling Stripe (e.g., `amountInUsdCents = totalPrice * BDT_TO_USD * 100`, `currency: "usd"`).
-- Do not accept live payments until a Stripe webhook endpoint verifies `stripe-signature`, handles duplicate events idempotently, marks orders paid, reconciles stock, and handles refunds/failed payments. The current branch does not yet implement this workflow.
+- Configure the Stripe webhook endpoint `<your-api-host>/api/v1/payment/webhook` with the `STRIPE_WEBHOOK_SECRET` signing secret. Subscribe to `payment_intent.succeeded`, `payment_intent.payment_failed`, and `payment_intent.canceled`. Test duplicate delivery, failed payments, and the out-of-stock refund path in Stripe test mode before enabling live payments.
 
 ## Database Notes
 - `price` is `DECIMAL(10,2)` (max ≈ 9,999,999.99).
 - Tables are not automatically created at server startup. Use versioned SQL migrations before deploying.
-- Stock is checked when an order is created, but stock reservation/decrement and payment-webhook reconciliation still need to be implemented.
+- Stock is checked when an order is created and decremented in the successful-payment webhook. If stock is no longer available by the time payment succeeds, the webhook requests an idempotent refund.
 
 ## Deployment Notes
 - Storefront & dashboard: deploy to Vercel/Netlify; set `VITE_API_URL` to your backend URL and `VITE_STRIPE_PUBLISHABLE_KEY`.
@@ -155,8 +157,8 @@ The `production-readiness/hardening` branch adds a real Express app entry point,
 
 This is **not yet a production release**. Before accepting customers or live payments, complete and verify all of the following:
 
-1. Implement and test a signed, idempotent Stripe webhook. Never trust the browser to confirm payment.
-2. Implement stock reservation, payment-failure release, order expiry, and refund handling.
+1. Test the Stripe webhook end-to-end in test mode, including duplicate delivery, failed/cancelled intents, and automatic refunds. Never trust the browser to confirm payment.
+2. Add pending-order expiry and cleanup so abandoned orders do not remain indefinitely.
 3. Add distributed rate limiting for login, registration, and password recovery.
 4. Add automated API/database tests and run storefront, dashboard, and server production builds.
 5. Add versioned database migrations, backups, monitoring, and a documented recovery process.
