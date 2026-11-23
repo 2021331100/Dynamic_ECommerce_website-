@@ -11,6 +11,15 @@ if (missing.length) {
 if (process.env.JWT_SECRET_KEY.length < 32) {
   throw new Error("JWT_SECRET_KEY must contain at least 32 characters.");
 }
+if (process.env.NODE_ENV === "production") {
+  const missingOrigins = ["FRONTEND_URL", "DASHBOARD_URL"].filter((key) => !process.env[key]);
+  if (missingOrigins.length) {
+    throw new Error(`Missing production origin configuration: ${missingOrigins.join(", ")}`);
+  }
+  if (!process.env.FRONTEND_URL.startsWith("https://") || !process.env.DASHBOARD_URL.startsWith("https://")) {
+    throw new Error("Production FRONTEND_URL and DASHBOARD_URL must use HTTPS.");
+  }
+}
 
 const [{ default: app }, { default: database }, { v2: cloudinary }] = await Promise.all([
   import("./app.js"),
