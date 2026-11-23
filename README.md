@@ -20,11 +20,10 @@ Full-stack commerce app with: customer storefront (Vite/React/Tailwind), admin d
 - `client/` — storefront app (React 19, Vite, Tailwind, Redux Toolkit)
 - `dashboard/` — admin UI (React 19, Vite, Recharts, Redux Toolkit)
 - `server/` — Express API, PostgreSQL, Stripe, Cloudinary, Nodemailer
-- `server/uploads/` — temp uploads (gitignored)
 - `.gitignore` — ignores envs, uploads, build artifacts
 
 ## Prerequisites
-- Node.js 18+
+- Node.js 20+
 - PostgreSQL 14+ (tested with 18)
 - Stripe account + API keys
 - Cloudinary account (cloud name, key, secret)
@@ -52,6 +51,8 @@ DB_NAME=mern_ecommerce_store
 # Stripe
 STRIPE_SECRET_KEY=sk_live_or_test
 STRIPE_WEBHOOK_SECRET=whsec_xxx
+STRIPE_CURRENCY=usd
+STRIPE_AMOUNT_MULTIPLIER=1
 STRIPE_FRONTEND_KEY=pk_live_or_test
 
 # Currency conversion (if catalog prices are BDT)
@@ -84,8 +85,8 @@ npm install
 npm run dev
 ```
 - Runs on `PORT` (default 4000).
-- `createTables()` seeds schema on start.
-- Stripe webhook: `/api/v1/payment/webhook` (raw body enabled in `app.js`).
+- The API checks database connectivity before listening. Apply database schema changes through a reviewed migration process; do not rely on runtime table creation in production.
+- `/health` is available for hosting-platform health checks.
 
 ### Client (storefront)
 ```
@@ -111,7 +112,7 @@ Visit `http://localhost:5174`.
 ## Key Features
 - Products: list, view, filter (category, price range, rating, availability), AI search, pagination (12/page)
 - Cart/Orders: place orders, shipping info capture, tax/shipping calculation
-- Payments: Stripe PaymentIntent, webhook updates order/payment status, stock decrement on success
+- Payments: Stripe PaymentIntent creation and signed webhook reconciliation; stock is checked/decremented on successful payment, and an out-of-stock payment is refunded.
 - Media: Cloudinary upload support
 - Auth: JWT-based auth with cookies
 - Admin: product CRUD, order view, dashboard charts (sales, low stock), modals for create/update/view
@@ -124,14 +125,15 @@ Visit `http://localhost:5174`.
 - Payments: `/api/v1/payment/webhook` (Stripe webhook; uses `stripe-signature` header)
 
 ## Payments (Stripe)
+- Amounts are converted using `STRIPE_AMOUNT_MULTIPLIER` and sent in `STRIPE_CURRENCY`. Keep the multiplier at `1` when catalog prices already use the Stripe currency. If the catalog uses BDT and Stripe charges USD, set a current BDT-to-USD multiplier and make the displayed checkout total clear.
 - Amount is sent in the configured currency inside `generatePaymentIntent`.
 - If catalog prices are BDT, convert before calling Stripe (e.g., `amountInUsdCents = totalPrice * BDT_TO_USD * 100`, `currency: "usd"`).
-- Set webhook endpoint in Stripe Dashboard to `<your-api-host>/api/v1/payment/webhook` using `STRIPE_WEBHOOK_SECRET`.
+- Configure the Stripe webhook endpoint `<your-api-host>/api/v1/payment/webhook` with the `STRIPE_WEBHOOK_SECRET` signing secret. Subscribe to `payment_intent.succeeded`, `payment_intent.payment_failed`, and `payment_intent.canceled`. Test duplicate delivery, failed payments, and the out-of-stock refund path in Stripe test mode before enabling live payments.
 
 ## Database Notes
 - `price` is `DECIMAL(10,2)` (max ≈ 9,999,999.99).
-- Tables auto-create on server start. For manual changes, run SQL via psql/pgAdmin.
-- Stock is decremented after successful payment webhook.
+- Tables are not automatically created at server startup. Use versioned SQL migrations before deploying.
+- Stock is checked when an order is created and decremented in the successful-payment webhook. If stock is no longer available by the time payment succeeds, the webhook requests an idempotent refund.
 
 ## Deployment Notes
 - Storefront & dashboard: deploy to Vercel/Netlify; set `VITE_API_URL` to your backend URL and `VITE_STRIPE_PUBLISHABLE_KEY`.
@@ -148,3 +150,20 @@ Visit `http://localhost:5174`.
 - Stripe high-amount failures: convert BDT totals to the Stripe currency before creating PaymentIntent.
 - CORS: confirm `FRONTEND_URL` and `DASHBOARD_URL` match the running origins; both are allowed in `app.js`.
 - Webhook 400: ensure raw body is preserved and `STRIPE_WEBHOOK_SECRET` matches; check the `stripe-signature` header.
+
+
+## Production-readiness status
+
+The `production-readiness/hardening` branch adds a real Express app entry point, a PostgreSQL connection pool, environment-based credentials, secure HTTP-only auth cookies, safer user responses, request-origin checks, upload limits, safer error responses, transactional order-record creation, and a corrected order lookup.
+
+This is **not yet a production release**. Before accepting customers or live payments, complete and verify all of the following:
+
+1. Test the Stripe webhook end-to-end in test mode, including duplicate delivery, failed/cancelled intents, and automatic refunds. Never trust the browser to confirm payment.
+2. Add pending-order expiry and cleanup so abandoned orders do not remain indefinitely.
+3. Add distributed rate limiting for login, registration, and password recovery.
+4. Add automated API/database tests and run storefront, dashboard, and server production builds.
+5. Add versioned database migrations, backups, monitoring, and a documented recovery process.
+6. Configure HTTPS, exact production origins, secure database networking, and provider-managed secrets.
+7. Review file upload content (not only MIME type), admin authorization, and all product/admin input validation.
+
+**Secret rotation is required:** the old repository history contains hardcoded database and Stripe credentials. Remove the old credentials at their providers and issue new ones. Deleting a secret from the latest source does not remove it from Git history.
