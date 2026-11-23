@@ -101,10 +101,7 @@ export const paymentWebhook = async (req, res) => {
       } finally {
         client.release();
       }
-    } else if (
-      event.type === "payment_intent.payment_failed" ||
-      event.type === "payment_intent.canceled"
-    ) {
+    } else if (event.type === "payment_intent.canceled") {
       const intent = event.data.object;
       await database.query(
         "UPDATE payments SET payment_status = 'Failed' WHERE payment_intent_id = $1 AND payment_status = 'Pending'",
@@ -114,6 +111,9 @@ export const paymentWebhook = async (req, res) => {
         "UPDATE orders SET order_status = 'Cancelled' WHERE id = (SELECT order_id FROM payments WHERE payment_intent_id = $1) AND paid_at IS NULL",
         [intent.id]
       );
+    } else if (event.type === "payment_intent.payment_failed") {
+      // A PaymentIntent can be retried after a failed card attempt. Keep it pending
+      // so a later payment_intent.succeeded event can still fulfil the order.
     }
 
     return res.status(200).json({ received: true });
