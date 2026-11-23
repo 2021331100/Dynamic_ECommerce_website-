@@ -17,6 +17,13 @@ if (process.env.NODE_ENV === "production") {
 
 // Basic browser security headers. HTTPS should also be enforced by the hosting platform.
 app.use((req, res, next) => {
+  const origin = req.headers.origin;
+  if (origin && !allowedOrigins.includes(origin)) {
+    return res.status(403).json({ success: false, message: "Origin is not allowed." });
+  }
+  if (["POST", "PUT", "PATCH", "DELETE"].includes(req.method) && origin && !allowedOrigins.includes(origin)) {
+    return res.status(403).json({ success: false, message: "Request origin is not allowed." });
+  }
   res.setHeader("X-Content-Type-Options", "nosniff");
   res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
   res.setHeader("X-Frame-Options", "DENY");
