@@ -9,7 +9,11 @@ const getStripe = () => {
 
 export async function generatePaymentIntent(orderId, totalPrice) {
   try {
-    const amount = Math.round(Number(totalPrice) * 100);
+    const multiplier = Number(process.env.STRIPE_AMOUNT_MULTIPLIER || 1);
+    if (!Number.isFinite(multiplier) || multiplier <= 0) {
+      throw new Error("STRIPE_AMOUNT_MULTIPLIER must be a positive number.");
+    }
+    const amount = Math.round(Number(totalPrice) * multiplier * 100);
     if (!Number.isSafeInteger(amount) || amount <= 0) {
       throw new Error("Payment amount must be a positive valid amount.");
     }
