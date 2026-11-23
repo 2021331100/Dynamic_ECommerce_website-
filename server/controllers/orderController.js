@@ -176,7 +176,7 @@ export const fetchSingleOrder = catchAsyncErrors(async (req, res, next) => {
   res.status(200).json({
     success: true,
     message: "Order fetched.",
-    order: result.rows[0],
+    orders: result.rows[0],
   });
 });
 
